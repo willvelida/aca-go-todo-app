@@ -5,8 +5,11 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/willvelida/aca-go-todo/pkg/dal"
 	"github.com/willvelida/aca-go-todo/pkg/handlers"
 )
+
+var collection = dal.ConnectDB()
 
 func main() {
 	router := mux.NewRouter()

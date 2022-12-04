@@ -57,9 +57,12 @@ resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
   name: accountName
   location: location
   tags: tags
-  kind: 'GlobalDocumentDB'
+  kind: 'MongoDB'
   properties: {
     databaseAccountOfferType: 'Standard'
+    apiProperties: {
+      serverVersion: '4.2'
+    }
     consistencyPolicy: consistencyPolicy[defaultConsistencyLevel]
     locations: [
       {
@@ -76,7 +79,7 @@ resource account 'Microsoft.DocumentDB/databaseAccounts@2022-05-15' = {
   }
 }
 
-resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15' = {
+resource database 'Microsoft.DocumentDB/databaseAccounts/mongodbDatabases@2022-05-15' = {
   name: databaseName
   parent: account
   properties: {
@@ -86,26 +89,24 @@ resource database 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases@2022-05-15
   }
 }
 
-resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2022-05-15' = {
+resource container 'Microsoft.DocumentDB/databaseAccounts/mongodbDatabases/collections@2022-05-15' = {
   name: containerName
   parent: database
   properties: {
     resource: {
       id: containerName
-      partitionKey: {
-        paths: [
-          '/id'
-        ]
-        kind: 'Hash'
+      shardKey: {
+        isCompleted: 'Hash'
       }
-      indexingPolicy: {
-        indexingMode: 'consistent'
-        includedPaths: [
-          {
-            path: '/*'
+      indexes: [
+        {
+          key: {
+            keys: [
+              '_id'
+            ]
           }
-        ]
-      }
+        }
+      ]
     }
   }
 }
